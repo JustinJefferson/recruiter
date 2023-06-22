@@ -15,6 +15,25 @@ class Recruit(models.Model):
     def __str__(self):
         return self.name
 
+    def desired_positions(self):
+        position_names = []
+        for position in Position.objects.filter(recruits=self.id):
+            position_names.append(position.name)
+        return position_names
+
+    def attended_events(self):
+        attended = []
+        for event in Event.objects.filter(students=self.id):
+            attended.append(event.name)
+        return attended
+
+    def incomplete_tasks(self):
+        tasks = []
+        for task in Task.objects.filter(student=self.id):
+            if task.status is not Task.COMPLETED:
+                tasks.append(task.name)
+        return tasks
+
 
 class Position(models.Model):
     name = models.CharField(max_length=48)
@@ -24,6 +43,15 @@ class Position(models.Model):
 
     def __str__(self):
         return self.name
+
+    def recruit_applicants(self):
+        applicants = []
+        for recruit in self.recruits.all():
+            applicants.append(recruit.name)
+        return applicants
+
+    def admin_url(self):
+        return format_html("<a href='/admin/recruit/position/{}/change'>{}</a>", self.id, self.name)
 
 
 class Event(models.Model):
@@ -35,6 +63,12 @@ class Event(models.Model):
 
     def __str__(self):
         return self.name
+
+    def available_positions(self):
+        available = []
+        for position in self.positions.all():
+            available.append(position.name)
+        return available
 
     def form_url(self):
         return format_html(

@@ -24,6 +24,7 @@ class PositionRecruitInline(admin.TabularInline):
 
 
 class StudentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'desired_positions', 'attended_events']
     inlines = [
         PositionRecruitInline,
         EventRecruitsInline,
@@ -39,7 +40,7 @@ class StudentAdmin(admin.ModelAdmin):
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ['name', 'form_url']
+    list_display = ['name', 'available_positions', 'form_url']
     inlines = [
         EventPositionsInline,
         EventRecruitsInline,
@@ -48,6 +49,8 @@ class EventAdmin(admin.ModelAdmin):
 
 
 class PositionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'available', 'recruit_applicants']
+    list_editable = ['available']
     inlines = [
         PositionRecruitInline
     ]
