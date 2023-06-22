@@ -18,8 +18,15 @@ class EventPositionsInline(admin.TabularInline):
     extra = 0
 
 
+class PositionRecruitInline(admin.TabularInline):
+    model = Position.recruits.through
+    extra = 0
+
+
 class StudentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'desired_positions', 'attended_events']
     inlines = [
+        PositionRecruitInline,
         EventRecruitsInline,
         TaskInline
     ]
@@ -33,7 +40,7 @@ class StudentAdmin(admin.ModelAdmin):
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ['name', 'form_url']
+    list_display = ['name', 'available_positions', 'form_url']
     inlines = [
         EventPositionsInline,
         EventRecruitsInline,
@@ -41,7 +48,16 @@ class EventAdmin(admin.ModelAdmin):
     exclude = ("positions", "students",)
 
 
+class PositionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'available', 'recruit_applicants']
+    list_editable = ['available']
+    inlines = [
+        PositionRecruitInline
+    ]
+    exclude = ("recruits",)
+
+
 # Register your models here.
 admin.site.register(Recruit, StudentAdmin)
 admin.site.register(Event, EventAdmin)
-admin.site.register(Position)
+admin.site.register(Position, PositionAdmin)
