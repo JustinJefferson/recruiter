@@ -20,6 +20,7 @@ class Position(models.Model):
     name = models.CharField(max_length=48)
     url = models.CharField(max_length=200)
     available = models.BooleanField(default=True)
+    recruits = models.ManyToManyField(Recruit, null=True, blank=True)
 
     def __str__(self):
         return self.name

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from datetime import date
 from .forms import CandidateCheckinForm
-from .models import Recruit, Task, Event
+from .models import Recruit, Task, Event, Position
 from django.http import HttpResponse, HttpResponseRedirect
 
 
@@ -17,16 +17,21 @@ def checkin(request, event_name):
             return HttpResponse("Invalid event")
 
     # create object of form
-    form = CandidateCheckinForm(request.POST or None, request.FILES or None)
+    form = CandidateCheckinForm(event=event, data=request.POST or None, files=request.FILES or None)
     # check if form data is valid
     if form.is_valid():
-
         # save the form data to model
         name = request.POST.get("name")
         email = request.POST.get("email")
+        position_id = request.POST.get("desired_position")
         student = Recruit.objects.get_or_create(email=email)[0]
         student.name = name
         student.save()
+
+        position = Position.objects.filter(id=position_id).first()
+        if position is not None:
+            position.recruits.add(student)
+            position.save()
 
         # Add student to the event if there is an event with the name in the URL
         if event is not None:
