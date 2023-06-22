@@ -23,8 +23,9 @@ def checkin(request, event_name):
         # save the form data to model
         name = request.POST.get("name")
         email = request.POST.get("email")
+        (student, student_created) = Recruit.objects.get_or_create(email=email)
         position_id = request.POST.get("desired_position")
-        student = Recruit.objects.get_or_create(email=email)[0]
+
         student.name = name
         student.save()
 
@@ -37,29 +38,30 @@ def checkin(request, event_name):
         if event is not None:
             event.students.add(student)
             event.save()
-
-        tasks = [
-            "Initial Email"
-            "Resume",
-            "Schedule Assessment",
-            "Assessment Completed",
-            "Assessment Feedback",
-            "Schedule Interview",
-            "Interview Completed",
-            "Interview Feedback"
-        ]
-
-        for task in tasks:
-            t = Task.objects.create(
-                name=task,
-                status=Task.INCOMPLETE,
-                student=student,
-                start_date=date.today(),
-                update_date=date.today(),
-            )
-            t.save()
         
-        return HttpResponseRedirect(request.path_info)
+        if student_created:
+            tasks = [
+                "Initial Email",
+                "Resume",
+                "Schedule Assessment",
+                "Assessment Completed",
+                "Assessment Feedback",
+                "Schedule Interview",
+                "Interview Completed",
+                "Interview Feedback"
+            ]
+
+            for task in tasks:
+                t = Task.objects.create(
+                    name=task,
+                    status=Task.INCOMPLETE,
+                    student=student,
+                    start_date=date.today(),
+                    update_date=date.today(),
+                )
+                t.save()
+        
+            return HttpResponseRedirect(request.path_info)
 
     context['form'] = form
     return render(request, "recruit/checkin.html", context)
